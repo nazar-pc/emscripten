@@ -72,6 +72,9 @@ var currentScriptUrl = (typeof document !== 'undefined' && document.currentScrip
 #endif
 
 if (typeof Module['locateFile'] !== 'function') {
+  if (Module['memoryInitializerPrefixURL'] || Module['pthreadMainPrefixURL'] || Module['cdInitializerPrefixURL'] || Module['filePackagePrefixURL']) {
+    throw new Error("Module['locateFile'] can't be used together with Module['*PrefixURL'] options; if you need to customize prefix, take a look at Module['scriptDirectory'] option instead");
+  }
   // `/` should be present at the end if `Module['scriptDirectory']` is not empty
   if (!Module['scriptDirectory']) {
     if (ENVIRONMENT_IS_NODE) {
