@@ -71,6 +71,24 @@ if (!ENVIRONMENT_IS_PTHREAD) PthreadWorkerInit = {};
 var currentScriptUrl = (typeof document !== 'undefined' && document.currentScript) ? document.currentScript.src : undefined;
 #endif
 
+if (typeof Module['locateFile'] !== 'function') {
+  // `/` should be present at the end if `Module['scriptDirectory']` is not empty
+  if (!Module['scriptDirectory']) {
+    if (ENVIRONMENT_IS_NODE) {
+      Module['scriptDirectory'] = __dirname + '/';
+    } else if (ENVIRONMENT_IS_WEB) {
+      Module['scriptDirectory'] = document.currentScript.src.split('/').slice(0, -1).join('/') + '/';
+    } else if (ENVIRONMENT_IS_WORKER) {
+      Module['scriptDirectory'] = self.location.href.split('/').slice(0, -1).join('/') + '/';
+    } else {
+      Module['scriptDirectory'] = '';
+    }
+  }
+  Module['locateFile'] = function (file) {
+    return Module['scriptDirectory'] + file;
+  }
+}
+
 if (ENVIRONMENT_IS_NODE) {
   // Expose functionality in the same simple way that the shells work
   // Note that we pollute the global namespace here, otherwise we break in node

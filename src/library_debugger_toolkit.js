@@ -446,10 +446,10 @@ var CyberDWARFHeapPrinter = function(cdFileLocation) {
 
   function initialize_debugger(cb) {
     var cdFile;
-    if (typeof Module['locateFile'] === 'function') {
-      cdFileLocation = Module['locateFile'](cdFileLocation);
-    } else if (Module['cdInitializerPrefixURL']) {
+    if (Module['cdInitializerPrefixURL']) {
       cdFileLocation = Module['cdInitializerPrefixURL'] + cdFileLocation;
+    } else {
+      cdFileLocation = Module['locateFile'](cdFileLocation);
     }
     if (ENVIRONMENT_IS_NODE || ENVIRONMENT_IS_SHELL) {
       var data = Module['read'](cdFileLocation);
