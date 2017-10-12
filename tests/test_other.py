@@ -7927,3 +7927,10 @@ int main() {
         print inc
         open('a.c', 'w').write(inc)
         subprocess.check_call([PYTHON, EMCC, '-std=c89', 'a.c'])
+
+  # Tests that Emscripten-compiled applications can be run from a relative path with node command line that is different than the current working directory.
+  def test_node_js_run_from_different_directory(self):
+    os.mkdir('subdir')
+    Popen([PYTHON, EMCC, path_from_root('tests', 'hello_world.c'), '-o', os.path.join('subdir', 'a.js'), '-O3']).communicate()
+    ret = Popen(NODE_JS + [os.path.join('subdir', 'a.js')], stdout=PIPE).communicate()[0]
+    assert 'hello, world!' in ret
