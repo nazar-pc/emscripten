@@ -84,12 +84,17 @@ if (typeof Module['locateFile'] !== 'function') {
       Module['scriptDirectory'] = '';
     }
   }
-  Module['locateFile'] = function (file) {
-    return Module['scriptDirectory'] + file;
+  if (!Module['memoryInitializerPrefixURL']) {
+    Module['memoryInitializerPrefixURL'] = Module['scriptDirectory'];
   }
-} else {
-  if (Module['memoryInitializerPrefixURL'] || Module['pthreadMainPrefixURL'] || Module['cdInitializerPrefixURL'] || Module['filePackagePrefixURL']) {
-    throw new Error("Module['locateFile'] can't be used together with Module['*PrefixURL'] options; if you need to customize prefix, take a look at Module['scriptDirectory'] option instead");
+  if (!Module['pthreadMainPrefixURL']) {
+    Module['pthreadMainPrefixURL'] = Module['scriptDirectory'];
+  }
+  if (!Module['cdInitializerPrefixURL']) {
+    Module['cdInitializerPrefixURL'] = Module['scriptDirectory'];
+  }
+  if (!Module['filePackagePrefixURL']) {
+    Module['filePackagePrefixURL'] = Module['scriptDirectory'];
   }
 }
 

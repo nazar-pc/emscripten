@@ -10,9 +10,7 @@ Not all changes are documented here. In particular, new features, user-oriented 
 Current trunk code
 ------------------
  - Updated to libc++'s "v2" ABI, which provides better alignment for string data and other improvements. This is an ABI-incompatible change, so bitcode files from previous versions will not be compatible.
- - Added new html setting Module['scriptDirectory'] that allows customizing the URL where .wasm, .mem and some other files are located (defaults to the same location as .js file)
- - If Module['locateFile'] is not specified explicitly it will be defined automatically using Module['scriptDirectory']
- - Module['locateFile'] priority comparing to other options decreased since it is now always defined
+ - Added new option "Module.scriptDirectory" that allows customizing the URL where .wasm, .mem and some other files are located (defaults to the same location as .js file)
  - To see a list of commits in the active development branch 'incoming', which have not yet been packaged in a release, see
     - Emscripten: https://github.com/kripken/emscripten/compare/1.37.13...incoming
     - Emscripten-LLVM: https://github.com/kripken/emscripten-fastcomp/compare/1.37.13...incoming

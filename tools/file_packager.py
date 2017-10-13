@@ -166,7 +166,7 @@ for arg in sys.argv[2:]:
     mode = leading
     at_position = arg.replace('@@', '__').find('@') # position of @ if we're doing 'src@dst'. '__' is used to keep the index same with the original if they escaped with '@@'.
     uses_at_notation = (at_position != -1) # '@@' in input string means there is an actual @ character, a single '@' means the 'src@dst' notation.
-    
+
     if uses_at_notation:
       srcpath = arg[0:at_position].replace('@@', '@') # split around the @
       dstpath = arg[at_position+1:].replace('@@', '@')
@@ -830,9 +830,9 @@ ret += '''%s
   Module['removeRunDependency']('%(metadata_file)s');
  }
 
- var REMOTE_METADATA_NAME = Module['filePackagePrefixURL'] ?
-                            ((Module['filePackagePrefixURL'] || '') + '%(metadata_file)s');
+ var REMOTE_METADATA_NAME = typeof Module['locateFile'] === 'function' ?
                             Module['locateFile']('%(metadata_file)s') :
+                            ((Module['filePackagePrefixURL'] || '') + '%(metadata_file)s');
  var xhr = new XMLHttpRequest();
  xhr.onreadystatechange = function() {
   if (xhr.readyState === 4 && xhr.status === 200) {

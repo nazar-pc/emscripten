@@ -2105,9 +2105,15 @@ function integrateWasmJS() {
   var method = Module['wasmJSMethod'] || '{{{ BINARYEN_METHOD }}}';
   Module['wasmJSMethod'] = method;
 
-  var wasmTextFile = Module['locateFile'](Module['wasmTextFile'] || '{{{ WASM_TEXT_FILE }}}');
-  var wasmBinaryFile = Module['locateFile'](Module['wasmBinaryFile'] || '{{{ WASM_BINARY_FILE }}}');
-  var asmjsCodeFile = Module['locateFile'](Module['asmjsCodeFile'] || '{{{ ASMJS_CODE_FILE }}}');
+  var wasmTextFile = Module['wasmTextFile'] || '{{{ WASM_TEXT_FILE }}}';
+  var wasmBinaryFile = Module['wasmBinaryFile'] || '{{{ WASM_BINARY_FILE }}}';
+  var asmjsCodeFile = Module['asmjsCodeFile'] || '{{{ ASMJS_CODE_FILE }}}';
+
+  if (typeof Module['locateFile'] === 'function') {
+    wasmTextFile = Module['locateFile'](wasmTextFile);
+    wasmBinaryFile = Module['locateFile'](wasmBinaryFile);
+    asmjsCodeFile = Module['locateFile'](asmjsCodeFile);
+  }
 
   // utilities
 
