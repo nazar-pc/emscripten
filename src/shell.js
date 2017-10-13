@@ -72,14 +72,11 @@ var currentScriptUrl = (typeof document !== 'undefined' && document.currentScrip
 #endif
 
 if (typeof Module['locateFile'] !== 'function') {
-  if (Module['memoryInitializerPrefixURL'] || Module['pthreadMainPrefixURL'] || Module['cdInitializerPrefixURL'] || Module['filePackagePrefixURL']) {
-    throw new Error("Module['locateFile'] can't be used together with Module['*PrefixURL'] options; if you need to customize prefix, take a look at Module['scriptDirectory'] option instead");
-  }
   // `/` should be present at the end if `Module['scriptDirectory']` is not empty
   if (!Module['scriptDirectory']) {
     if (ENVIRONMENT_IS_NODE) {
       Module['scriptDirectory'] = __dirname + '/';
-	} else if (ENVIRONMENT_IS_WEB && document.currentScript.src.indexOf('blob:') !== 0) {
+    } else if (ENVIRONMENT_IS_WEB && document.currentScript.src.indexOf('blob:') !== 0) {
       Module['scriptDirectory'] = document.currentScript.src.split('/').slice(0, -1).join('/') + '/';
     } else if (ENVIRONMENT_IS_WORKER) {
       Module['scriptDirectory'] = self.location.href.split('/').slice(0, -1).join('/') + '/';
@@ -89,6 +86,10 @@ if (typeof Module['locateFile'] !== 'function') {
   }
   Module['locateFile'] = function (file) {
     return Module['scriptDirectory'] + file;
+  }
+} else {
+  if (Module['memoryInitializerPrefixURL'] || Module['pthreadMainPrefixURL'] || Module['cdInitializerPrefixURL'] || Module['filePackagePrefixURL']) {
+    throw new Error("Module['locateFile'] can't be used together with Module['*PrefixURL'] options; if you need to customize prefix, take a look at Module['scriptDirectory'] option instead");
   }
 }
 
