@@ -150,8 +150,8 @@ var LibraryEmVal = {
       argsList[0] = constructor;
       for (var i = 0; i < argCount; ++i) {
         var argType = requireRegisteredType(HEAP32[(argTypes >> 2) + i], 'parameter ' + i);
-        argsList[i + 1] = argType.readValueFromPointer(args);
-        args += argType.argPackAdvance;
+        argsList[i + 1] = argType['readValueFromPointer'](args);
+        args += argType['argPackAdvance'];
       }
       var obj = new (constructor.bind.apply(constructor, argsList));
       return __emval_register(obj);
@@ -302,17 +302,17 @@ var LibraryEmVal = {
     var invokerFunction = function(handle, name, destructors, args) {
       var offset = 0;
       for (var i = 0; i < argCount - 1; ++i) {
-        argN[i] = types[i + 1].readValueFromPointer(args + offset);
-        offset += types[i + 1].argPackAdvance;
+        argN[i] = types[i + 1]['readValueFromPointer'](args + offset);
+        offset += types[i + 1]['argPackAdvance'];
       }
       var rv = handle[name].apply(handle, argN);
       for (var i = 0; i < argCount - 1; ++i) {
-        if (types[i + 1].deleteObject) {
-          types[i + 1].deleteObject(argN[i]);
+        if (types[i + 1]['deleteObject']) {
+          types[i + 1]['deleteObject'](argN[i]);
         }
       }
       if (!retType.isVoid) {
-        return retType.toWireType(destructors, rv);
+        return retType['toWireType'](destructors, rv);
       }
     };
     return __emval_addMethodCaller(invokerFunction);

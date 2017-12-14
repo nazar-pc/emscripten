@@ -821,10 +821,10 @@ var LibraryEmbind = {
       var destructors = needsDestructorStack ? [] : null;
       var thisWired;
       if (isClassMethodFunc) {
-        thisWired = argTypes[1].toWireType(destructors, this);
+        thisWired = argTypes[1]['toWireType'](destructors, this);
       }
       for (var i = 0; i < argCount - 2; ++i) {
-        argsWired[i] = argTypes[i + 2].toWireType(destructors, arguments[i]);
+        argsWired[i] = argTypes[i + 2]['toWireType'](destructors, arguments[i]);
       }
 
       var invokerFuncArgs = isClassMethodFunc ?
@@ -848,7 +848,7 @@ var LibraryEmbind = {
 #endif
 
       if (returns) {
-        return argTypes[0].fromWireType(rv);
+        return argTypes[0]['fromWireType'](rv);
       }
     });
   },
