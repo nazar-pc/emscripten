@@ -816,7 +816,7 @@ var LibraryEmbind = {
         throwBindingError('function ' + humanName + ' called with ' + arguments.length + ' arguments, expected ' + (argCount - 2) + ' args!');
       }
 #if EMSCRIPTEN_TRACING
-      Module.emscripten_trace_enter_context('embind::' + humanName);
+      Module['emscripten_trace_enter_context']('embind::' + humanName);
 #endif
       var destructors = needsDestructorStack ? [] : null;
       var thisWired;
@@ -844,7 +844,7 @@ var LibraryEmbind = {
       }
 
 #if EMSCRIPTEN_TRACING
-      Module.emscripten_trace_exit_context();
+      Module['emscripten_trace_exit_context']();
 #endif
 
       if (returns) {
@@ -858,7 +858,6 @@ var LibraryEmbind = {
     signature = readLatin1String(signature);
 
     function makeDynCaller(dynCall) {
-#if NO_DYNAMIC_EXECUTION
       return function() {
           var args = new Array(arguments.length + 1);
           args[0] = rawFunction;
@@ -867,19 +866,6 @@ var LibraryEmbind = {
           }
           return dynCall.apply(null, args);
       };
-#else
-        var args = [];
-        for (var i = 1; i < signature.length; ++i) {
-            args.push('a' + i);
-        }
-
-        var name = 'dynCall_' + signature + '_' + rawFunction;
-        var body = 'return function ' + name + '(' + args.join(', ') + ') {\n';
-        body    += '    return dynCall(rawFunction' + (args.length ? ', ' : '') + args.join(', ') + ');\n';
-        body    += '};\n';
-
-        return (new Function('dynCall', 'rawFunction', body))(dynCall, rawFunction);
-#endif
     }
 
     var fp;

@@ -1,6 +1,5 @@
 /*global Module:true, Runtime*/
 /*global HEAP32*/
-/*global new_*/
 /*global createNamedFunction*/
 /*global readLatin1String, stringToUTF8*/
 /*global requireRegisteredType, throwBindingError, runDestructors*/
@@ -146,7 +145,6 @@ var LibraryEmVal = {
         var obj = new constructor(arg0, arg1, arg2);
         return __emval_register(obj);
     } */
-#if NO_DYNAMIC_EXECUTION
     var argsList = new Array(argCount + 1);
     return function(constructor, argTypes, args) {
       argsList[0] = constructor;
@@ -158,30 +156,6 @@ var LibraryEmVal = {
       var obj = new (constructor.bind.apply(constructor, argsList));
       return __emval_register(obj);
     };
-#else
-    var argsList = "";
-    for(var i = 0; i < argCount; ++i) {
-        argsList += (i!==0?", ":"")+"arg"+i; // 'arg0, arg1, ..., argn'
-    }
-
-    var functionBody =
-        "return function emval_allocator_"+argCount+"(constructor, argTypes, args) {\n";
-
-    for(var i = 0; i < argCount; ++i) {
-        functionBody +=
-            "var argType"+i+" = requireRegisteredType(HEAP32[(argTypes >> 2) + "+i+"], \"parameter "+i+"\");\n" +
-            "var arg"+i+" = argType"+i+".readValueFromPointer(args);\n" +
-            "args += argType"+i+"['argPackAdvance'];\n";
-    }
-    functionBody +=
-        "var obj = new constructor("+argsList+");\n" +
-        "return __emval_register(obj);\n" +
-        "}\n";
-
-    /*jshint evil:true*/
-    return (new Function("requireRegisteredType", "HEAP32", "__emval_register", functionBody))(
-        requireRegisteredType, HEAP32, __emval_register);
-#endif
   },
 
   _emval_new__deps: ['$craftEmvalAllocator', '$emval_newers', '$requireHandle'],
@@ -197,13 +171,12 @@ var LibraryEmVal = {
     return newer(handle, argTypes, args);
   },
 
-#if NO_DYNAMIC_EXECUTION
   $emval_get_global: function() {
     function testGlobal(obj) {
       obj['$$$embind_global$$$'] = obj;
       var success = typeof $$$embind_global$$$ === 'object' && obj['$$$embind_global$$$'] === obj;
       if (!success) {
-	delete obj['$$$embind_global$$$'];
+        delete obj['$$$embind_global$$$'];
       }
       return success;
     }
@@ -220,10 +193,6 @@ var LibraryEmVal = {
     }
     throw Error('unable to get global object.');
   },
-#else
-  // appease jshint (technically this code uses eval)
-  $emval_get_global: function() { return (function(){return Function;})()('return this')(); },
-#endif
   _emval_get_global__deps: ['_emval_register', '$getStringOrSymbol', '$emval_get_global'],
   _emval_get_global: function(name) {
     if(name===0){
@@ -324,12 +293,11 @@ var LibraryEmVal = {
     return id;
   },
 
-  _emval_get_method_caller__deps: ['_emval_addMethodCaller', '_emval_lookupTypes', '$new_', '$makeLegalFunctionName'],
+  _emval_get_method_caller__deps: ['_emval_addMethodCaller', '_emval_lookupTypes', '$makeLegalFunctionName'],
   _emval_get_method_caller: function(argCount, argTypes) {
     var types = __emval_lookupTypes(argCount, argTypes);
 
     var retType = types[0];
-#if NO_DYNAMIC_EXECUTION
     var argN = new Array(argCount - 1);
     var invokerFunction = function(handle, name, destructors, args) {
       var offset = 0;
@@ -347,47 +315,6 @@ var LibraryEmVal = {
         return retType.toWireType(destructors, rv);
       }
     };
-#else
-    var signatureName = retType.name + "_$" + types.slice(1).map(function (t) { return t.name; }).join("_") + "$";
-
-    var params = ["retType"];
-    var args = [retType];
-
-    var argsList = ""; // 'arg0, arg1, arg2, ... , argN'
-    for (var i = 0; i < argCount - 1; ++i) {
-        argsList += (i !== 0 ? ", " : "") + "arg" + i;
-        params.push("argType" + i);
-        args.push(types[1 + i]);
-    }
-
-    var functionName = makeLegalFunctionName("methodCaller_" + signatureName);
-    var functionBody =
-        "return function " + functionName + "(handle, name, destructors, args) {\n";
-
-    var offset = 0;
-    for (var i = 0; i < argCount - 1; ++i) {
-        functionBody +=
-        "    var arg" + i + " = argType" + i + ".readValueFromPointer(args" + (offset ? ("+"+offset) : "") + ");\n";
-        offset += types[i + 1]['argPackAdvance'];
-    }
-    functionBody +=
-        "    var rv = handle[name](" + argsList + ");\n";
-    for (var i = 0; i < argCount - 1; ++i) {
-        if (types[i + 1]['deleteObject']) {
-            functionBody +=
-            "    argType" + i + ".deleteObject(arg" + i + ");\n";
-        }
-    }
-    if (!retType.isVoid) {
-        functionBody +=
-        "    return retType.toWireType(destructors, rv);\n";
-    }
-    functionBody +=
-        "};\n";
-
-    params.push(functionBody);
-    var invokerFunction = new_(Function, params).apply(null, args);
-#endif
     return __emval_addMethodCaller(invokerFunction);
   },
 
