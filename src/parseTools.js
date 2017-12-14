@@ -465,7 +465,7 @@ function splitI64(value, floatConversion) {
     asmCoercion('Math_abs(VALUE)', 'double') + ' >= ' + asmEnsureFloat('1', 'double') + ' ? ' +
       '(VALUE > ' + asmEnsureFloat('0', 'double') + ' ? ' +
                asmCoercion('Math_min(' + asmCoercion('Math_floor((VALUE)/' + asmEnsureFloat(4294967296, 'double') + ')', 'double') + ', ' + asmEnsureFloat(4294967295, 'double') + ')', 'i32') + '>>>0' +
-               ' : ' + asmFloatToInt(asmCoercion('Math_ceil((VALUE - +((' + asmFloatToInt('VALUE') + ')>>>0))/' + asmEnsureFloat(4294967296, 'double') + ')', 'double')) + '>>>0' + 
+               ' : ' + asmFloatToInt(asmCoercion('Math_ceil((VALUE - +((' + asmFloatToInt('VALUE') + ')>>>0))/' + asmEnsureFloat(4294967296, 'double') + ')', 'double')) + '>>>0' +
       ')' +
     ' : 0',
     value,
@@ -1010,7 +1010,7 @@ function makeSetValues(ptr, pos, value, type, num, align) {
   if (value < 0) value += 256; // make it unsigned
   var values = {
     1: value,
-    2: value | (value << 8), 
+    2: value | (value << 8),
     4: value | (value << 8) | (value << 16) | (value << 24)
   };
   var ret = [];
@@ -1450,22 +1450,7 @@ function makeDynCall(sig) {
 
 function heapAndOffset(heap, ptr) { // given   HEAP8, ptr   , we return    splitChunk, relptr
   if (!SPLIT_MEMORY) return heap + ',' + ptr;
-  return heap + 's[(' + ptr + ') >> SPLIT_MEMORY_BITS], (' + ptr + ') & SPLIT_MEMORY_MASK'; 
-}
-
-function makeEval(code) {
-  if (NO_DYNAMIC_EXECUTION == 1) {
-    // Treat eval as error.
-    return "abort('NO_DYNAMIC_EXECUTION=1 was set, cannot eval');";
-  }
-  var ret = '';
-  if (NO_DYNAMIC_EXECUTION == 2) {
-    // Warn on evals, but proceed.
-    ret += "Module.printErr('Warning: NO_DYNAMIC_EXECUTION=2 was set, but calling eval in the following location:');\n";
-    ret += "Module.printErr(stackTrace());\n";
-  }
-  ret += code;
-  return ret;
+  return heap + 's[(' + ptr + ') >> SPLIT_MEMORY_BITS], (' + ptr + ') & SPLIT_MEMORY_MASK';
 }
 
 function makeStaticAlloc(size) {

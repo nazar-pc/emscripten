@@ -941,8 +941,6 @@ There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR P
 
       assert not (shared.Settings.EMTERPRETIFY_FILE and shared.Settings.SINGLE_FILE), 'cannot have both EMTERPRETIFY_FILE and SINGLE_FILE enabled at the same time'
 
-      assert not (shared.Settings.NO_DYNAMIC_EXECUTION and options.use_closure_compiler), 'cannot have both NO_DYNAMIC_EXECUTION and closure compiler enabled at the same time'
-
       if options.emrun:
         shared.Settings.EXPORTED_RUNTIME_METHODS.append('addOnExit')
 
@@ -1026,8 +1024,6 @@ There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR P
               shared.Settings.EXPORTED_FUNCTIONS.append(required_export)
         else:
           logging.debug('using response file for EXPORTED_FUNCTIONS, make sure it includes _malloc and _free')
-
-      assert not (shared.Settings.NO_DYNAMIC_EXECUTION and shared.Settings.RELOCATABLE), 'cannot have both NO_DYNAMIC_EXECUTION and RELOCATABLE enabled at the same time, since RELOCATABLE needs to eval()'
 
       if shared.Settings.RELOCATABLE:
         assert shared.Settings.GLOBAL_BASE < 1

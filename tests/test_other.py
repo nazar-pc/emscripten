@@ -2131,8 +2131,7 @@ int f() {
         (['--bind', '-O2'], False),
         (['--bind', '-O2', '-s', 'ALLOW_MEMORY_GROWTH=1', path_from_root('tests', 'embind', 'isMemoryGrowthEnabled=true.cpp')], False),
     ]
-    test_cases.extend([ (args[:] + ['-s', 'NO_DYNAMIC_EXECUTION=1'], status) for args, status in test_cases])
-    test_cases.append((['--bind', '-O2', '--closure', '1'], False)) # closure compiler doesn't work with NO_DYNAMIC_EXECUTION=1
+    test_cases.extend([ (args[:] + ['--closure', '1'], status) for args, status in test_cases])
 
     for args, fail in test_cases:
       print(args, fail)
@@ -3686,59 +3685,6 @@ int main(int argc, char **argv) {
         assert 'function requested to be exported, but not implemented: " _main"' in stderr, stderr
       else:
         self.assertContained('hello, world!', run_js('a.out.js'))
-
-  def test_no_dynamic_execution(self):
-    cmd = [PYTHON, EMCC, path_from_root('tests', 'hello_world.c'), '-O1', '-s', 'NO_DYNAMIC_EXECUTION=1']
-    stdout, stderr = Popen(cmd, stderr=PIPE).communicate()
-    self.assertContained('hello, world!', run_js('a.out.js'))
-    src = open('a.out.js').read()
-    assert 'eval(' not in src
-    assert 'eval.' not in src
-    assert 'new Function' not in src
-    try_delete('a.out.js')
-
-    # Test that --preload-file doesn't add an use of eval().
-    cmd = [PYTHON, EMCC, path_from_root('tests', 'hello_world.c'), '-O1', '-s', 'NO_DYNAMIC_EXECUTION=1', '--preload-file', 'temp.txt']
-    stdout, stderr = Popen(cmd, stderr=PIPE).communicate()
-    self.assertContained('hello, world!', run_js('a.out.js'))
-    src = open('a.out.js').read()
-    assert 'eval(' not in src
-    assert 'eval.' not in src
-    assert 'new Function' not in src
-    try_delete('a.out.js')
-
-    # Test that -s NO_DYNAMIC_EXECUTION=1 and --closure 1 are not allowed together.
-    cmd = [PYTHON, EMCC, path_from_root('tests', 'hello_world.c'), '-O1', '-s', 'NO_DYNAMIC_EXECUTION=1', '--closure', '1']
-    proc = Popen(cmd, stderr=PIPE)
-    proc.communicate()
-    assert proc.returncode != 0
-    try_delete('a.out.js')
-
-    # Test that -s NO_DYNAMIC_EXECUTION=1 and -s RELOCATABLE=1 are not allowed together.
-    cmd = [PYTHON, EMCC, path_from_root('tests', 'hello_world.c'), '-O1', '-s', 'NO_DYNAMIC_EXECUTION=1', '-s', 'RELOCATABLE=1']
-    proc = Popen(cmd, stderr=PIPE)
-    proc.communicate()
-    assert proc.returncode != 0
-    try_delete('a.out.js')
-
-    open('test.c', 'w').write(r'''
-      #include <emscripten/emscripten.h>
-      int main() {
-        emscripten_run_script("console.log('hello from script');");
-        return 0;
-      }
-      ''')
-
-    # Test that emscripten_run_script() aborts when -s NO_DYNAMIC_EXECUTION=1
-    Popen([PYTHON, EMCC, 'test.c', '-O1', '-s', 'NO_DYNAMIC_EXECUTION=1']).communicate()
-    self.assertContained('NO_DYNAMIC_EXECUTION=1 was set, cannot eval', run_js(os.path.join(self.get_dir(), 'a.out.js'), assert_returncode=None, full_output=True, stderr=PIPE))
-    try_delete('a.out.js')
-
-    # Test that emscripten_run_script() posts a warning when -s NO_DYNAMIC_EXECUTION=2
-    Popen([PYTHON, EMCC, 'test.c', '-O1', '-s', 'NO_DYNAMIC_EXECUTION=2']).communicate()
-    self.assertContained('Warning: NO_DYNAMIC_EXECUTION=2 was set, but calling eval in the following location:', run_js(os.path.join(self.get_dir(), 'a.out.js'), assert_returncode=None, full_output=True, stderr=PIPE))
-    self.assertContained('hello from script', run_js(os.path.join(self.get_dir(), 'a.out.js'), assert_returncode=None, full_output=True, stderr=PIPE))
-    try_delete('a.out.js')
 
   def test_init_file_at_offset(self):
     open('src.cpp', 'w').write(r'''

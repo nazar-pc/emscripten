@@ -2182,7 +2182,7 @@ function integrateWasmJS() {
     if (typeof Module['asm'] !== 'function' || Module['asm'] === methodHandler) {
       if (!Module['asmPreload']) {
         // you can load the .asm.js file before this, to avoid this sync xhr and eval
-        {{{ makeEval("eval(Module['read'](asmjsCodeFile));") }}} // set Module.asm
+        eval(Module['read'](asmjsCodeFile));
       } else {
         Module['asm'] = Module['asmPreload'];
       }
