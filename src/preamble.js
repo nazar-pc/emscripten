@@ -1985,13 +1985,13 @@ function integrateWasmJS() {
 
   if (typeof Module['locateFile'] === 'function') {
     if (!isDataURI(wasmTextFile)) {
-      wasmTextFile = Module['locateFile'](wasmTextFile);
+      wasmTextFile = Module['locateFile'](wasmTextFile, Module['scriptDirectory']);
     }
     if (!isDataURI(wasmBinaryFile)) {
-      wasmBinaryFile = Module['locateFile'](wasmBinaryFile);
+      wasmBinaryFile = Module['locateFile'](wasmBinaryFile, Module['scriptDirectory']);
     }
     if (!isDataURI(asmjsCodeFile)) {
-      asmjsCodeFile = Module['locateFile'](asmjsCodeFile);
+      asmjsCodeFile = Module['locateFile'](asmjsCodeFile, Module['scriptDirectory']);
     }
   } else {
     if (!isDataURI(wasmTextFile)) {

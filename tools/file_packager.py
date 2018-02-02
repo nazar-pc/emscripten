@@ -846,7 +846,7 @@ ret += '''%s
  }
 
  var REMOTE_METADATA_NAME = typeof Module['locateFile'] === 'function' ?
-                            Module['locateFile']('%(metadata_file)s') :
+                            Module['locateFile']('%(metadata_file)s', Module['scriptDirectory']) :
                             (Module['filePackagePrefixURL'] + '%(metadata_file)s');
  var xhr = new XMLHttpRequest();
  xhr.onreadystatechange = function() {

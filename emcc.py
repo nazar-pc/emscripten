@@ -2549,7 +2549,7 @@ def generate_html(target, options, js_target, target_basename,
       script.inline = ('''
           var memoryInitializer = '%s';
           if (typeof Module['locateFile'] === 'function') {
-            memoryInitializer = Module['locateFile'](memoryInitializer);
+            memoryInitializer = Module['locateFile'](memoryInitializer, Module['scriptDirectory']);
           } else {
             memoryInitializer = Module['memoryInitializerPrefixURL'] + memoryInitializer;
           }

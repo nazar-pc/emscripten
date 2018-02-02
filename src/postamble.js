@@ -41,7 +41,7 @@ if (memoryInitializer) {
 #endif
   if (!isDataURI(memoryInitializer)) {
     if (typeof Module['locateFile'] === 'function') {
-      memoryInitializer = Module['locateFile'](memoryInitializer);
+      memoryInitializer = Module['locateFile'](memoryInitializer, Module['scriptDirectory']);
     } else {
       memoryInitializer = Module['memoryInitializerPrefixURL'] + memoryInitializer;
     }

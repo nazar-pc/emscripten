@@ -10,6 +10,7 @@ Not all changes are documented here. In particular, new features, user-oriented 
 Current Trunk
 -------------
  - Added new option "Module.scriptDirectory" that allows customizing the URL where .wasm, .mem and some other files are located (defaults to the same location as .js file)
+ * "Module.scriptDirectory" (either developer-specified or inferred by Emscripten) is passed as second argument to "Module.locateFile"
 
 v1.37.28: 01/08/2018
 --------------------
